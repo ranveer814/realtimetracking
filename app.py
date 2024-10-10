@@ -22,14 +22,14 @@ async def submit_data(file: UploadFile = File(...)):
         data = json.loads(contents)
 
         # Extract the details
-        unique_id = data.get("id")
+        uniqueID = data.get("uniqueID")
         name = data.get("name")
         longitude = data.get("longitude")
         latitude = data.get("latitude")
         floor = data.get("floor")
         
         # Append the data to the CSV file
-        new_data = pd.DataFrame([[unique_id, name, longitude, latitude, floor]], 
+        new_data = pd.DataFrame([[uniqueID, name, longitude, latitude, floor]], 
                                  columns=["Unique ID", "Name", "Longitude", "Latitude", "Floor"])
         new_data.to_csv(csv_file, mode='a', header=False, index=False)
         
