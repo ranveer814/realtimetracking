@@ -1,35 +1,40 @@
 import os
 import json
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 import pandas as pd
+from pydantic import BaseModel
 
 app = FastAPI()
 
 # Define the CSV file path
 csv_file = 'data.csv'
 
-# Check if the CSV file exists, if not create one with headers
+# Check if the CSV file exists; if not, create one with headers
 if not os.path.exists(csv_file):
     df = pd.DataFrame(columns=["Unique ID", "Name", "Longitude", "Latitude", "Floor"])
     df.to_csv(csv_file, index=False)
 
-@app.post("/submit-data")
-async def submit_data(file: UploadFile = File(...)):
-    try:
-        # Read the JSON file content
-        contents = await file.read()
-        data = json.loads(contents)
+# Define the data model for incoming data
+class LocationData(BaseModel):
+    name: str
+    uniqueID: str
+    floor: int
+    latitude: float  # Use float for latitude (double in Python)
+    longitude: float  # Use float for longitude (double in Python)
 
-        # Extract the details
-        uniqueID = data.get("uniqueID")
-        name = data.get("name")
-        longitude = data.get("longitude")
-        latitude = data.get("latitude")
-        floor = data.get("floor")
+@app.post("/submit-data")
+async def submit_data(data: LocationData):
+    try:
+        # Extract the details from the incoming data
+        unique_id = data.uniqueID
+        name = data.name
+        longitude = data.longitude
+        latitude = data.latitude
+        floor = data.floor
         
         # Append the data to the CSV file
-        new_data = pd.DataFrame([[uniqueID, name, longitude, latitude, floor]], 
+        new_data = pd.DataFrame([[unique_id, name, longitude, latitude, floor]], 
                                  columns=["Unique ID", "Name", "Longitude", "Latitude", "Floor"])
         new_data.to_csv(csv_file, mode='a', header=False, index=False)
         
