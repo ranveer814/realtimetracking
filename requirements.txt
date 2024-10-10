@@ -1,5 +1,5 @@
-fastapi
-gunicorn
-uvicorn
+fastapi==0.95.1
+gunicorn==21.2.0
+uvicorn==0.22.0
 pandas==1.5.3  # Use a compatible version
 numpy==1.23.5   # Use a compatible version
